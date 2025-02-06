@@ -64,3 +64,80 @@ function write(text, pos, r, g, b, a) {
 function clear() {
     c.clearRect(0, 0, window.innerWidth, window.innerHeight)
 }
+
+class Player {
+    constructor(pos, health, damage, type) {
+        this.pos = pos
+        this.health = health
+        this.damage = damage
+        this.type = type
+    }
+}
+
+class Attack {
+    constructor(pos, damage) {
+        this.pos = pos
+        this.damage = damage
+        setTimeout(function() {
+            attacks.splice(0, 1)
+        }, 1000)
+    }
+}
+
+let player = new Player(new Vector2(0, 0), 100, 1, 'sword')
+
+let tilemap
+let attacks = []
+let mouse = new Vector2(0, 0)
+document.addEventListener("keydown", function(event) {
+    if (event.key == 'w') {
+        player.pos.y -= 1
+    }
+    if (event.key == 'a') {
+        player.pos.x -= 1
+    }
+    if (event.key == 's') {
+        player.pos.y += 1
+    }
+    if (event.key == 'd') {
+        player.pos.x += 1
+    }
+})
+document.addEventListener("mousemove", function(event) {
+    mouse.x = event.clientX
+    mouse.y = event.clientY
+})
+document.addEventListener("click", function(event) {
+    mouse.x = event.clientX
+    mouse.y = event.clientY
+    //attack
+    let dir = new Vector2(0, 0)
+    if (mouse.x < (player.pos.x+0.5)*100 && Math.abs(mouse.y - (player.pos.y+0.5)*100) < Math.abs(mouse.x - (player.pos.x+0.5)*100)) {
+        dir = new Vector2(-1, 0)
+    }
+    if (mouse.x > (player.pos.x+0.5)*100 && Math.abs(mouse.y - (player.pos.y+0.5)*100) < Math.abs(mouse.x - (player.pos.x+0.5)*100)) {
+        dir = new Vector2(1, 0)
+    }
+    if (mouse.y < (player.pos.y+0.5)*100 && Math.abs(mouse.y - (player.pos.y+0.5)*100) > Math.abs(mouse.x - (player.pos.x+0.5)*100)) {
+        dir = new Vector2(0, -1)
+    }
+    if (mouse.y > (player.pos.y+0.5)*100 && Math.abs(mouse.y - (player.pos.y+0.5)*100) > Math.abs(mouse.x - (player.pos.x+0.5)*100)) {
+        dir = new Vector2(0, 1)
+    }
+
+    attacks.push(new Attack(new Vector2(player.pos.x + 0.25, player.pos.y + 0.25).add(dir), player.damage))
+})
+function draw() {
+    clear()
+    drawRect(player.pos.multiply(100), new Vector2(100, 100), 0, 0, 0, 1)
+    for (let i of attacks) {
+        drawRect(i.pos.multiply(100), new Vector2(50, 50), 255, 0, 0, 1)
+    }
+}
+function run() {
+    draw()
+    for (let i of attacks) {
+        // update code
+    }
+}
+setInterval(run, 1)
